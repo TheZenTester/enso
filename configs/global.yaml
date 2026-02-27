@@ -1,0 +1,73 @@
+# ENSO Global Configuration
+
+execution_strategy: concurrent  # 'linear' (list order) or 'concurrent' (parallel with dependencies)
+log_level: INFO             # Options: DEBUG, INFO, WARNING, ERROR; Default: INFO
+
+# Network validation settings
+# random_host_count: integer (e.g. 5) for a hard count, or percentage string (e.g. "20%") of scope hosts
+random_host_count: 2
+reachability_threshold: 0.5 # Minimum ratio of reachable hosts required (0.0-1.0)
+
+# Scan Pipeline Configuration
+# ---------------------------
+# Modules can be any name - not limited to built-in tools. This allows for future 
+# integrations and custom plugins.
+#
+# depends_on: A list of modules that must complete before this module starts.
+#             Only applies in 'concurrent' mode. In 'linear' mode, modules run in list order.
+#
+# Example pipeline with 8 modules showing multiple dependencies:
+
+# Directories under scans/ to exclude from 'enso export' zip.
+# Dotfiles (e.g. .enso_exports.json) are always excluded automatically.
+export_exclude_dirs: []
+
+# Directory under scans/ for credential check reports (nxc output)
+cred_check_dir: cred_checks
+
+scan_pipeline:
+  # === Stage 1: Discovery (no dependencies) ===
+  - name: nmap_discovery
+    enabled: true
+    description: "Host discovery and port scanning"
+    output_dir: "nmap/discovery"
+
+  # === Stage 2: Runs after nmap_discovery ===
+  - name: nmap_deep
+    enabled: true
+    description: "Deep scan with service detection and NSE scripts"
+    depends_on: [nmap_discovery]
+    output_dir: "nmap/detailed"
+
+  - name: nessus
+    enabled: true
+    description: "Vulnerability scanning with Nessus"
+    output_dir: "nessus"
+    # depends_on: [nmap_discovery]
+
+  # - name: web_enum
+  #   enabled: true
+  #   description: "Web application enumeration (dirbusting, tech detection)"
+  #   depends_on: [nmap_discovery]
+
+  # # === Stage 3: Runs after Stage 2 modules ===
+  # - name: vuln_analysis
+  #   enabled: true
+  #   description: "Automated vulnerability analysis and prioritization"
+  #   depends_on: [nmap_deep, nessus]  # Needs both deep scan and Nessus results
+
+  # - name: web_vuln_scan
+  #   enabled: true
+  #   description: "Web vulnerability scanning (SQLi, XSS, etc)"
+  #   depends_on: [web_enum]
+
+  # # === Stage 4: Final stage ===
+  # - name: report_generator
+  #   enabled: true
+  #   description: "Generate consolidated pentest report"
+  #   depends_on: [vuln_analysis, web_vuln_scan]  # Waits for all vuln scans
+
+  # - name: executive_summary
+  #   enabled: true
+  #   description: "Generate executive summary with risk ratings"
+  #   depends_on: [vuln_analysis, web_vuln_scan]

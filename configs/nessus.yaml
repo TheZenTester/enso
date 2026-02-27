@@ -1,0 +1,40 @@
+# ENSO Nessus Configuration
+# ========================
+#
+# API Key Setup (RECOMMENDED)
+# ---------------------------
+# Run: enso nessus setup
+#
+# This prompts for your API keys and stores them securely at:
+#   ~/.config/enso/nessus_keys (with 600 permissions)
+#
+# Keys persist across reboots and terminal sessions. No need to
+# set environment variables or put keys directly in this file.
+#
+# Key Resolution Priority
+# -----------------------
+# 1. Secure key file (~/.config/enso/nessus_keys) - preferred
+# 2. Environment variables (NESSUS_ACCESS_KEY, NESSUS_SECRET_KEY)
+# 3. Direct values in this file (only if file has 600 permissions)
+#
+# Commands
+# --------
+#   enso nessus setup  - Store API keys securely
+#   enso nessus check  - Validate configuration and connectivity
+#   enso nessus clear  - Remove stored keys
+
+url: https://localhost:8834
+
+# API credentials (optional in this file)
+# If using 'enso nessus setup', you can leave these as-is or remove them.
+# They only apply if no keys are found in ~/.config/enso/nessus_keys
+access_key: ${NESSUS_ACCESS_KEY}
+secret_key: ${NESSUS_SECRET_KEY}
+
+# Policy Mapping
+# Maps scan types to Nessus policy names
+policy_mapping:
+  default: "All Policies - Web Checks"
+  # Add additional policies as needed, e.g.:
+  # internal: "Internal Network Scan"
+  # external: "External Perimeter Scan"

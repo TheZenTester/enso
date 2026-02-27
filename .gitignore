@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+.venv/
+
+# Testing
+.pytest_cache/
+
+# Claude Code
+.claude/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / credentials
+.env
+*.key
+~/.config/enso/
+configs/credentials.yaml
+configs/engagement.yaml
+
+# Scan output data (never commit real scan results)
+scans/
+
+# Enterprise-only docs (public repo)
+docs/internal/

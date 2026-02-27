@@ -1,0 +1,78 @@
+# ENSO Engagement Configuration
+# Defines engagement type, directory layout, scope files, and network drops.
+
+# Engagement type: 'simple' (single network) or 'complex' (multiple networks)
+engagement_type: simple
+
+# Root client directory for all engagement files
+client_dir: /client
+
+# Directory containing scope files (relative to client_dir)
+scope_dir: engagement_docs
+
+# Default network interface for all network drops
+# If null/omitted, auto-detects the interface with the default gateway
+interface: null
+
+# ── Simple engagement settings ──────────────────────────────────────
+# Used when engagement_type is 'simple' and no network_drops are defined.
+simple:
+  output_dir: internal                # Base output dir (relative to client_dir)
+  scope_files:
+    in_scope: client_inscope.txt             # Relative to scope_dir
+    excluded: excluded.txt
+    special: special_considerations.txt
+
+# ── Complex engagement defaults ─────────────────────────────────────
+# IMPORTANT: Default scope files inherited by ALL network drops.
+# Drops can override any field individually.
+# Set a field to "" to explicitly have no file for that drop.
+# complex:
+#   scope_files:
+#     excluded: excluded.txt
+#     special: special_considerations.txt
+
+# ── Network drops ───────────────────────────────────────────────────
+# For simple engagements: define one entry (or none to use simple defaults).
+# For complex engagements: define multiple entries.
+#
+# Subnet can be specified in TWO formats:
+#   - CIDR notation: subnet: "24" or subnet: "/24"
+#   - Netmask format: netmask: "255.255.255.0"
+
+network_drops:
+  - name: "Corporate LAN"
+    network_dir: "corporate_lan"      # Filesystem path (auto-generated from name if not set)
+    static_ip: "10.0.0.100"
+    subnet: "24"
+    gateway: "10.0.0.1"
+    dns:
+      - "10.0.0.10"
+    scope_files:
+      in_scope: inscope.txt           # Relative to scope_dir
+
+# --- Multi-drop example (uncomment for complex engagements) ---
+# engagement_type: complex
+#
+# network_drops:
+#   - name: "Server Room"
+#     static_ip: "10.10.10.50"
+#     subnet: "24"
+#     gateway: "10.10.10.1"
+#     dns:
+#       - "10.10.10.10"
+#     # output_dir defaults to network_dir ("server_room") if not set
+#     scope_files:
+#       in_scope: server_room_inscope.txt
+#       # excluded & special inherited from complex.scope_files
+#
+#   - name: "3rd Floor"
+#     static_ip: "192.168.50.100"
+#     subnet: "24"
+#     gateway: "192.168.50.1"
+#     dns:
+#       - "192.168.50.10"
+#     output_dir: 3rd_floor                    # explicit override
+#     scope_files:
+#       in_scope: 3rd_floor_inscope.txt
+#       excluded: 3rd_floor_excluded.txt       # overrides complex default

@@ -1,0 +1,20 @@
+# ENSO Nmap Configuration
+
+discovery:
+  flags: "-sT -vv -T4 --max-retries=4 -Pn" # do not include -p here. Specify in default_ports
+  # Port options:
+  #   'all' for -p- (all 65535 ports)
+  #   integer for --top-ports N (e.g., 1000 for top 1000)
+  #   comma-separated list for specific ports (e.g., "22,80,443,8080,3389")
+  default_ports: all
+
+# IMPORTANT: DO NOT include -p here, it is handled by the deep scan by default.
+deep:
+  flags: "-sT -sV -O -sC -vv --max-retries=4"
+
+max_threads: 2  # Number of concurrent Nmap scans
+host_timeout: "5m"  # Per-host timeout (e.g., '35m', '1h'). Empty string to disable.
+log_dir: nmap/logs  # Nmap command output log directory (relative to scans/)
+
+quality_gate:
+  dead_host_threshold: 0.7  # Prompt user if >70% of hosts appear offline
