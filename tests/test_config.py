@@ -9,6 +9,8 @@ import yaml
 
 from enso.config import (
     load_config,
+    check_example_configs,
+    check_missing_configs,
     GlobalConfig,
     NmapConfig,
     NessusConfig,
@@ -1036,6 +1038,70 @@ class TestFilterByNames:
         filtered = creds.filter_by_names(["admin", "nonexistent"], ["also_missing"])
         assert list(filtered.windows.keys()) == ["admin"]
         assert filtered.linux == {}
+
+
+class TestCheckExampleConfigs:
+    """Tests for check_example_configs() setup detection."""
+
+    def test_no_example_files(self, tmp_path):
+        """No .example files returns empty list."""
+        (tmp_path / "global.yaml").write_text("log_level: INFO\n")
+        assert check_example_configs(tmp_path) == []
+
+    def test_example_without_yaml(self, tmp_path):
+        """Example file without corresponding .yaml is flagged."""
+        (tmp_path / "credentials.yaml.example").write_text("windows: {}\n")
+        result = check_example_configs(tmp_path)
+        assert result == ["credentials.yaml"]
+
+    def test_example_with_yaml_present(self, tmp_path):
+        """Example file with corresponding .yaml is not flagged."""
+        (tmp_path / "credentials.yaml.example").write_text("windows: {}\n")
+        (tmp_path / "credentials.yaml").write_text("windows: {}\n")
+        assert check_example_configs(tmp_path) == []
+
+    def test_multiple_examples_mixed(self, tmp_path):
+        """Only flags examples that are missing their .yaml counterpart."""
+        (tmp_path / "credentials.yaml.example").write_text("")
+        (tmp_path / "credentials.yaml").write_text("")
+        (tmp_path / "engagement.yaml.example").write_text("")
+        # engagement.yaml is missing
+        result = check_example_configs(tmp_path)
+        assert result == ["engagement.yaml"]
+
+    def test_empty_directory(self, tmp_path):
+        """Empty config directory returns empty list."""
+        assert check_example_configs(tmp_path) == []
+
+
+class TestCheckMissingConfigs:
+    """Tests for check_missing_configs() critical file detection."""
+
+    def test_all_configs_present(self, tmp_path):
+        """No warnings when critical yaml files exist."""
+        (tmp_path / "credentials.yaml").write_text("windows: {}\n")
+        (tmp_path / "engagement.yaml").write_text("engagement_type: simple\n")
+        assert check_missing_configs(tmp_path) == []
+
+    def test_missing_credentials(self, tmp_path):
+        """Flags missing credentials.yaml when no .example exists either."""
+        (tmp_path / "engagement.yaml").write_text("engagement_type: simple\n")
+        assert check_missing_configs(tmp_path) == ["credentials.yaml"]
+
+    def test_missing_engagement(self, tmp_path):
+        """Flags missing engagement.yaml when no .example exists either."""
+        (tmp_path / "credentials.yaml").write_text("windows: {}\n")
+        assert check_missing_configs(tmp_path) == ["engagement.yaml"]
+
+    def test_both_missing(self, tmp_path):
+        """Flags both when neither exists."""
+        assert check_missing_configs(tmp_path) == ["credentials.yaml", "engagement.yaml"]
+
+    def test_example_exists_not_flagged(self, tmp_path):
+        """Does not flag files that have a .example counterpart."""
+        (tmp_path / "credentials.yaml.example").write_text("windows: {}\n")
+        (tmp_path / "engagement.yaml.example").write_text("engagement_type: simple\n")
+        assert check_missing_configs(tmp_path) == []
 
 
 class TestCheckInterfaceLink:

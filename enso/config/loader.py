@@ -88,6 +88,40 @@ def load_config(config_dir: Path | str) -> EnsoConfig:
     )
 
 
+_CRITICAL_CONFIGS = ["credentials.yaml", "engagement.yaml"]
+
+
+def check_missing_configs(config_dir: Path | str) -> list[str]:
+    """Check for critical config files that are missing entirely.
+
+    Returns a list of filenames that don't exist and have no .example counterpart.
+    Files that have a .example are handled by check_example_configs() instead.
+    """
+    config_path = Path(config_dir)
+    missing = []
+    for name in _CRITICAL_CONFIGS:
+        yaml_file = config_path / name
+        example_file = config_path / f"{name}.example"
+        if not yaml_file.exists() and not example_file.exists():
+            missing.append(name)
+    return missing
+
+
+def check_example_configs(config_dir: Path | str) -> list[str]:
+    """Check for .example config files that haven't been copied to .yaml.
+
+    Returns a list of basenames (without .example) that need setup.
+    Only warns if the .example exists but the corresponding .yaml does not.
+    """
+    config_path = Path(config_dir)
+    missing = []
+    for example_file in sorted(config_path.glob("*.example")):
+        yaml_file = example_file.with_suffix("")  # strips .example
+        if not yaml_file.exists():
+            missing.append(yaml_file.name)
+    return missing
+
+
 def get_default_config_dir() -> Path:
     """Get the default configuration directory.
     

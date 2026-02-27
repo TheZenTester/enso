@@ -14,7 +14,7 @@ from .models import (
     check_file_permissions,
     is_credentials_file_secure,
 )
-from .loader import load_config, get_default_config_dir
+from .loader import load_config, get_default_config_dir, check_example_configs, check_missing_configs
 
 __all__ = [
     "GlobalConfig",
@@ -29,6 +29,8 @@ __all__ = [
     "ComplexConfig",
     "load_config",
     "get_default_config_dir",
+    "check_example_configs",
+    "check_missing_configs",
     "check_file_permissions",
     "is_credentials_file_secure",
 ]

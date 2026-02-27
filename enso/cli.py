@@ -17,7 +17,7 @@ from .cli_helpers import (
     run_pre_flight_checks,
     sync_nessus_credentials,
 )
-from .config import load_config, get_default_config_dir, EnsoConfig
+from .config import load_config, get_default_config_dir, check_example_configs, check_missing_configs, EnsoConfig
 from .context import ContextManager, EngagementContext
 from .utils.logging import setup_logging, get_logger
 
@@ -70,6 +70,21 @@ def main(
         console.print(f"[yellow]Warning: Config directory not found: {cfg_dir}[/yellow]")
         console.print("[dim]Using default configuration[/dim]")
         config = EnsoConfig()
+
+    # Check for .example files that haven't been copied
+    missing_examples = check_example_configs(cfg_dir)
+    if missing_examples:
+        console.print("[red]Missing required config files:[/red]")
+        for name in missing_examples:
+            console.print(f"  cp configs/{name}.example configs/{name}")
+        console.print("\n[dim]Copy the example files above, edit them for your environment, then re-run.[/dim]")
+        raise typer.Exit(code=1)
+
+    # Warn about critical config files missing entirely (no .yaml and no .example)
+    missing_configs = check_missing_configs(cfg_dir)
+    for name in missing_configs:
+        label = name.replace(".yaml", "")
+        console.print(f"[yellow]Warning: {name} not found — running without {label} configuration.[/yellow]")
     
     # Setup logging
     log_level = "DEBUG" if verbose else config.global_config.log_level
