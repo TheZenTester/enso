@@ -1,4 +1,8 @@
 # ENSO Engagement Configuration
+#
+# SETUP: Copy this file to engagement.yaml and fill in your values:
+#   cp engagement.yaml.example engagement.yaml
+#
 # Defines engagement type, directory layout, scope files, and network drops.
 
 # Engagement type: 'simple' (single network) or 'complex' (multiple networks)

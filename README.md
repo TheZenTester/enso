@@ -19,12 +19,20 @@ pip install -e .
 
 ## Quick Start
 
-### 1. Edit configuration files
+### 1. Set up configuration files
 
-The `configs/` directory ships with sane defaults. At minimum, edit:
+The `configs/` directory ships with sane defaults. Two files require setup -- copy the example templates and edit them for your environment:
 
-- `engagement.yaml` -- set your client directory, scope files, and network drops
+```
+cd configs/
+cp credentials.yaml.example credentials.yaml
+cp engagement.yaml.example engagement.yaml
+```
+
+Then edit:
+
 - `credentials.yaml` -- add Windows/SSH credentials for authenticated scanning
+- `engagement.yaml` -- set your client directory, scope files, and network drops
 
 ### 2. Store Nessus API keys
 
@@ -46,6 +54,14 @@ ENSO walks you through the entire workflow interactively: network configuration 
 
 ```
 enso status
+```
+
+### 5. Export results (optional)
+
+Once scanning is complete (or in-progress), package your scan artifacts into a zip for delivery or archival. ENSO collects nmap, Nessus, and credential check results, and tracks what's already been exported so subsequent runs only include new or changed files.
+
+```
+enso export
 ```
 
 ## How It Works

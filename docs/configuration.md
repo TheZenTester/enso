@@ -2,6 +2,14 @@
 
 ENSO loads configuration from a directory of YAML files. Each file is optional -- missing files use built-in defaults.
 
+Two files ship as `.example` templates and must be copied before use:
+
+```
+cd configs/
+cp credentials.yaml.example credentials.yaml
+cp engagement.yaml.example engagement.yaml
+```
+
 **Config directory search order:**
 
 1. `--config-dir` / `ENSO_CONFIG_DIR` (if specified)

@@ -31,6 +31,3 @@ configs/engagement.yaml
 
 # Scan output data (never commit real scan results)
 scans/
-
-# Enterprise-only docs (public repo)
-docs/internal/
