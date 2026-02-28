@@ -259,11 +259,15 @@ class NessusValidator:
                     missing.append(policy_name)
 
             if missing:
+                available = sorted(policies.keys())
+                detail = f"Missing: {', '.join(missing)}"
+                if available:
+                    detail += f"\n  Available policies: {', '.join(available)}"
                 report.add(
                     "Policy Mapping",
                     False,
                     f"{len(missing)} policy(ies) not found",
-                    f"Missing: {', '.join(missing)}",
+                    detail,
                 )
             else:
                 report.add(

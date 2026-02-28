@@ -214,7 +214,9 @@ class NessusBridge:
         """
         try:
             policies = self._nessus.policies.list()
+            available_names = []
             for p in policies:
+                available_names.append(p["name"])
                 if p["name"] == policy_name:
                     policy_id = p["id"]
                     template_uuid = p.get("template_uuid")
@@ -235,6 +237,11 @@ class NessusBridge:
                         return None
 
                     return policy_id, template_uuid
+
+            logger.error(
+                f"Policy '{policy_name}' not found on Nessus server. "
+                f"Available policies: {', '.join(available_names) or '(none)'}"
+            )
         except Exception as e:
             logger.error(f"Failed to look up policy '{policy_name}': {e}")
         return None
